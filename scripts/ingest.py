@@ -15,7 +15,7 @@ from app.domain.rag.embedding import OllamaEmbeddingProvider
 from app.domain.rag.ingestion import IngestionService
 from app.infrastructure.vector_store.chroma_store import ChromaVectorStore
 
-SUPPORTED_SUFFIXES = {".txt", ".pdf", ".docx"}
+SUPPORTED_SUFFIXES = {".txt", ".md", ".markdown", ".pdf", ".docx"}
 
 
 def collect_files(path: Path) -> list[Path]:

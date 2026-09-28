@@ -21,3 +21,21 @@ class OllamaEmbeddingProvider(EmbeddingProvider):
             resp = self._client.embeddings(model=self.model, prompt=text)
             embeddings.append(resp["embedding"])
         return embeddings
+
+
+class SentenceTransformerEmbeddingProvider(EmbeddingProvider):
+    """基于 sentence-transformers 的本地嵌入模型（bge-large-zh-v1.5）。"""
+
+    def __init__(self, model_path: str | None = None) -> None:
+        if model_path is None:
+            from app.core.config.settings import get_settings
+
+            model_path = get_settings().semantic_embedding_model
+        from sentence_transformers import SentenceTransformer
+
+        self._model = SentenceTransformer(model_path)
+
+    def embed(self, texts: list[str]) -> list[list[float]]:
+        """生成文本嵌入向量（已归一化）。"""
+        vectors = self._model.encode(texts, normalize_embeddings=True)
+        return [v.tolist() for v in vectors]

@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     # 精排模型（CrossEncoder）
     reranker_model: str = "models/bge-reranker-base"
 
+    # 语义分块嵌入模型
+    semantic_embedding_model: str = "models/bge-large-zh-v1.5"
+
     # ChromaDB
     chroma_persist_dir: str = "./data/chroma"
 

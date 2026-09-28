@@ -50,7 +50,7 @@ class DocxLoader(DocumentLoader):
 def get_loader(path: str) -> DocumentLoader:
     """根据文件扩展名返回对应加载器。"""
     suffix = Path(path).suffix.lower()
-    if suffix == ".txt":
+    if suffix in (".txt", ".md", ".markdown"):
         return TextLoader()
     if suffix == ".pdf":
         return PdfLoader()
