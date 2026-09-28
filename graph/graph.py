@@ -1,11 +1,13 @@
-"""LangGraph 状态机组装。
+"""LangGraph 状态机组装（含能力型子图）。
 
-定义 Agent 状态机的节点、边与条件路由。节点调用领域层接口，
-通过懒加载单例获取服务实例，避免启动时建立重资源连接。
+主图调度三类能力子图（RAG 检索 / 工具执行 / 结果校验），
+为多智能体阶段 2 的能力型拆分预留边界，子图可独立编译与替换。
+节点通过懒加载单例获取服务，避免启动时建立重资源连接。
 """
 
 import logging
 from functools import lru_cache
+from uuid import uuid4
 
 from langgraph.graph import END, StateGraph
 
@@ -45,11 +47,33 @@ def _get_rag_engine():
     return engine
 
 
+@lru_cache
+def _get_injection_detector():
+    from app.domain.validator.injection import InjectionDetector
+
+    return InjectionDetector()
+
+
+@lru_cache
+def _get_tool_registry():
+    from app.domain.tools.compliance import ComplianceCheckTool
+    from app.domain.tools.registry import ToolRegistry
+
+    registry = ToolRegistry()
+    registry.register(ComplianceCheckTool())
+    return registry
+
+
 # ---- 节点 ----
 
 def preprocess(state: AgentState) -> AgentState:
-    """输入预处理：清洗与标准化（脱敏、注入检测后续接入）。"""
+    """输入预处理：注入检测 + 清洗标准化。"""
     raw = state.get("user_input", "")
+    report = _get_injection_detector().detect(raw)
+    if report["detected"]:
+        state["metadata"] = {"injection": report}
+        state["generation"] = "检测到疑似注入内容，已拒绝处理。请勿尝试覆盖系统指令或泄露提示词。"
+        state["execution_status"] = "failed"
     state["normalized_input"] = raw.strip()
     state.setdefault("max_retries", 2)
     state.setdefault("retry_count", 0)
@@ -82,13 +106,26 @@ def retrieve(state: AgentState) -> AgentState:
 
 
 def execute_tool(state: AgentState) -> AgentState:
-    """工具执行：匹配工具并执行（工具插件接入后填充）。"""
-    state["tool_results"] = []
+    """工具执行：匹配工具并执行。"""
+    registry = _get_tool_registry()
+    query = state.get("normalized_input", "") or state.get("user_input", "")
+    result = registry.execute("compliance_check", {"text": query})
+    state["tool_results"] = [
+        {
+            "call_id": uuid4().hex,
+            "tool_name": "compliance_check",
+            "status": result.status,
+            "output": result.output,
+            "error": result.error,
+        }
+    ]
     return state
 
 
 def generate(state: AgentState) -> AgentState:
     """推理生成：组装 Prompt 调用本地大模型。"""
+    if state.get("metadata", {}).get("injection", {}).get("detected"):
+        return state  # 已拒绝注入，跳过模型调用
     llm = _get_llm()
     query = state.get("normalized_input", "") or state.get("user_input", "")
     rag_context = state.get("rag_context")
@@ -130,7 +167,8 @@ def validate(state: AgentState) -> AgentState:
 
 def save_checkpoint(state: AgentState) -> AgentState:
     """检查点保存：由 LangGraph checkpointer 自动处理，此处标记完成。"""
-    state["execution_status"] = "success"
+    if state.get("execution_status") != "failed":
+        state["execution_status"] = "success"
     return state
 
 
@@ -151,18 +189,47 @@ def should_retry(state: AgentState) -> str:
     return "continue"
 
 
-# ---- 图组装 ----
+# ---- 能力型子图（多智能体阶段 2 预留）----
+
+def build_retrieval_subgraph():
+    """RAG 检索子图。"""
+    builder = StateGraph(AgentState)
+    builder.add_node("retrieve", retrieve)
+    builder.set_entry_point("retrieve")
+    builder.add_edge("retrieve", END)
+    return builder.compile()
+
+
+def build_tool_subgraph():
+    """工具执行子图。"""
+    builder = StateGraph(AgentState)
+    builder.add_node("execute_tool", execute_tool)
+    builder.set_entry_point("execute_tool")
+    builder.add_edge("execute_tool", END)
+    return builder.compile()
+
+
+def build_validation_subgraph():
+    """结果校验子图。"""
+    builder = StateGraph(AgentState)
+    builder.add_node("validate", validate)
+    builder.set_entry_point("validate")
+    builder.add_edge("validate", END)
+    return builder.compile()
+
+
+# ---- 主图组装 ----
 
 def build_graph():
-    """构建 Agent 状态机。"""
+    """构建 Agent 状态机（主图调度能力子图）。"""
     builder = StateGraph(AgentState)
 
     builder.add_node("preprocess", preprocess)
     builder.add_node("classify_intent", classify_intent)
-    builder.add_node("retrieve", retrieve)
-    builder.add_node("execute_tool", execute_tool)
+    builder.add_node("retrieval", build_retrieval_subgraph())
+    builder.add_node("tool", build_tool_subgraph())
     builder.add_node("generate", generate)
-    builder.add_node("validate", validate)
+    builder.add_node("validation", build_validation_subgraph())
     builder.add_node("save_checkpoint", save_checkpoint)
 
     builder.set_entry_point("preprocess")
@@ -171,14 +238,14 @@ def build_graph():
     builder.add_conditional_edges(
         "classify_intent",
         route_intent,
-        {"rag": "retrieve", "tool": "execute_tool", "direct": "generate"},
+        {"rag": "retrieval", "tool": "tool", "direct": "generate"},
     )
-    builder.add_edge("retrieve", "generate")
-    builder.add_edge("execute_tool", "generate")
-    builder.add_edge("generate", "validate")
+    builder.add_edge("retrieval", "generate")
+    builder.add_edge("tool", "generate")
+    builder.add_edge("generate", "validation")
 
     builder.add_conditional_edges(
-        "validate",
+        "validation",
         should_retry,
         {"retry": "generate", "fallback": "save_checkpoint", "continue": "save_checkpoint"},
     )
