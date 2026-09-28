@@ -1,0 +1,36 @@
+# ===== Web 框架 =====
+fastapi>=0.110
+uvicorn[standard]>=0.29
+
+# ===== 配置与数据校验 =====
+pydantic>=2.6
+pydantic-settings>=2.2
+python-dotenv>=1.0
+
+# ===== Agent 框架 =====
+langchain>=0.2
+langchain-community>=0.2
+langgraph>=0.2
+
+# ===== 模型接入（Ollama）=====
+langchain-ollama>=0.1
+ollama>=0.3
+
+# ===== 向量库 =====
+chromadb>=0.5
+
+# ===== 检索与嵌入（CrossEncoder 精排 / 嵌入模型）=====
+sentence-transformers>=3.0
+
+# ===== 关键词检索（BM25）=====
+rank-bm25>=0.2.2
+
+# ===== 文档解析（PDF / Word）=====
+pypdf>=4.0
+python-docx>=1.1
+
+# ===== 类型兼容（Python 3.10）=====
+typing-extensions>=4.9
+
+# ===== 工具类（重试与指数退避）=====
+tenacity>=8.2

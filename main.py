@@ -1,16 +1,28 @@
-# 这是一个示例 Python 脚本。
+"""应用入口。
 
-# 按 Shift+F10 执行或将其替换为您的代码。
-# 按 双击 Shift 在所有地方搜索类、文件、工具窗口、操作和设置。
+启动 FastAPI 服务，初始化日志配置并注册路由。
+"""
+
+from fastapi import FastAPI
+
+from app.api.routes.chat import router as chat_router
+from app.api.routes.health import router as health_router
+from app.core.logging.logger import setup_logging
 
 
-def print_hi(name):
-    # 在下面的代码行中使用断点来调试脚本。
-    print(f'Hi, {name}')  # 按 Ctrl+F8 切换断点。
+def create_app() -> FastAPI:
+    """创建 FastAPI 应用。"""
+    setup_logging()
+    app = FastAPI(title="audit-agent", version="0.1.0")
+    app.include_router(health_router)
+    app.include_router(chat_router)
+    return app
 
 
-# 按间距中的绿色按钮以运行脚本。
-if __name__ == '__main__':
-    print_hi('PyCharm')
+app = create_app()
 
-# 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
