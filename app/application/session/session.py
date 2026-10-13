@@ -112,3 +112,28 @@ class SessionManager:
         with closing(self._connect()) as conn:
             conn.execute("DELETE FROM sessions WHERE session_id=?", (session_id,))
             conn.commit()
+
+    def list_sessions(self, user_id: Optional[str] = None) -> list[dict]:
+        """列出会话（可选按用户过滤），按更新时间倒序。"""
+        with closing(self._connect()) as conn:
+            if user_id:
+                rows = conn.execute(
+                    "SELECT session_id, user_id, status, created_at, updated_at "
+                    "FROM sessions WHERE user_id=? ORDER BY updated_at DESC",
+                    (user_id,),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT session_id, user_id, status, created_at, updated_at "
+                    "FROM sessions ORDER BY updated_at DESC",
+                ).fetchall()
+        return [
+            {
+                "session_id": r[0],
+                "user_id": r[1],
+                "status": r[2],
+                "created_at": r[3],
+                "updated_at": r[4],
+            }
+            for r in rows
+        ]
