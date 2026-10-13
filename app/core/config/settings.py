@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     model_timeout: int = 60
     model_max_concurrency: int = 4
 
+    # 模型来源：ollama（本地）/ api（远程 OpenAI 兼容）
+    llm_provider: str = "ollama"
+    api_base_url: str = "https://api.openai.com/v1"
+    api_key: str = ""
+    api_model: str = "gpt-4o-mini"
+
     # 嵌入模型
     embedding_model: str = "nomic-embed-text"
 
