@@ -4,60 +4,42 @@
 对话历史（短期记忆）持久化到 SQLite，支持窗口截断与跨重启恢复。
 """
 
-import sqlite3
 from contextlib import closing
-from datetime import datetime, timezone
-from pathlib import Path
 from typing import Optional
 from uuid import uuid4
 
+from app.infrastructure.persistence.sqlite_base import SqliteBase
 
-class SessionManager:
+
+class SessionManager(SqliteBase):
     """基于 SQLite 的会话管理器。"""
+
+    _DDL = """
+        CREATE TABLE IF NOT EXISTS sessions (
+            session_id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (session_id) REFERENCES sessions(session_id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id, id);
+    """
 
     def __init__(self, db_path: Optional[str] = None, max_messages: int = 20) -> None:
         if db_path is None:
             from app.core.config.settings import get_settings
 
             db_path = get_settings().session_db_path
-        self._db_path = db_path
+        super().__init__(db_path)
         self._max_messages = max_messages
-        self._init_db()
-
-    def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self._db_path)
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA foreign_keys=ON")
-        return conn
-
-    def _init_db(self) -> None:
-        Path(self._db_path).parent.mkdir(parents=True, exist_ok=True)
-        with closing(self._connect()) as conn:
-            conn.executescript(
-                """
-                CREATE TABLE IF NOT EXISTS sessions (
-                    session_id TEXT PRIMARY KEY,
-                    user_id TEXT NOT NULL,
-                    status TEXT NOT NULL DEFAULT 'active',
-                    created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL
-                );
-                CREATE TABLE IF NOT EXISTS messages (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    session_id TEXT NOT NULL,
-                    role TEXT NOT NULL,
-                    content TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    FOREIGN KEY (session_id) REFERENCES sessions(session_id) ON DELETE CASCADE
-                );
-                CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id, id);
-                """
-            )
-            conn.commit()
-
-    @staticmethod
-    def _now() -> str:
-        return datetime.now(timezone.utc).isoformat()
 
     def get_or_create(self, session_id: Optional[str], user_id: str = "anonymous") -> str:
         """获取已存在会话，不存在则创建并返回会话 ID。"""
