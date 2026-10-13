@@ -44,3 +44,6 @@ logs/
 # ===== 系统 =====
 .DS_Store
 Thumbs.db
+
+# ===== 运行时 SQLite 临时文件 =====
+*.sqlite
