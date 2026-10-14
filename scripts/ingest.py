@@ -10,8 +10,12 @@ import argparse
 import sys
 from pathlib import Path
 
+# 确保项目根目录在 sys.path 中，支持任意位置执行脚本
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from app.core.logging.logger import setup_logging
 from app.domain.rag.ingestion.service import IngestionService
+from app.domain.rag.ingestion.splitters.factory import get_collection_for_path
 from app.domain.rag.retrieval.embedding import OllamaEmbeddingProvider
 from app.infrastructure.vector_store.chroma_store import ChromaVectorStore
 
@@ -34,19 +38,22 @@ def collect_files(path: Path) -> list[Path]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="审计文档批量入库")
     parser.add_argument("path", help="文件或目录路径")
-    parser.add_argument("--collection", default="accounting_standards", help="目标 Collection")
+    parser.add_argument("--collection", default=None, help="目标 Collection（默认按路径自动判断）")
     parser.add_argument("--chunk-size", type=int, default=500)
     parser.add_argument("--chunk-overlap", type=int, default=50)
     args = parser.parse_args()
 
     setup_logging()
 
+    collection = args.collection or get_collection_for_path(args.path)
+    print(f"目标 Collection: {collection}")
+
     vector_store = ChromaVectorStore()
     embedding = OllamaEmbeddingProvider()
     service = IngestionService(
         vector_store=vector_store,
         embedding=embedding,
-        collection=args.collection,
+        collection=collection,
         chunk_size=args.chunk_size,
         chunk_overlap=args.chunk_overlap,
     )

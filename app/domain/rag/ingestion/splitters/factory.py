@@ -17,3 +17,11 @@ def get_splitter_for_path(path: str):
     from app.domain.rag.ingestion.splitters.article import ArticleSplitter
 
     return ArticleSplitter()
+
+
+def get_collection_for_path(path: str) -> str:
+    """根据文档路径返回对应的 ChromaDB Collection。"""
+    p = str(path)
+    if "judgements" in p:
+        return "case_library"
+    return "regulatory_laws"

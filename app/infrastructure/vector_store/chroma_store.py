@@ -23,7 +23,8 @@ class ChromaVectorStore(VectorStore):
         embeddings: list[list[float]],
     ) -> None:
         coll = self.get_collection(collection)
-        ids = [str(m["doc_id"]) for m in metadatas]
+        # 同一文档分块需唯一 ID，用 doc_id + 序号
+        ids = [f"{m.get('doc_id', 'doc')}_{i}" for i, m in enumerate(metadatas)]
         coll.add(ids=ids, documents=documents, metadatas=metadatas, embeddings=embeddings)
 
     def query(
