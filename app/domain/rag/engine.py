@@ -6,7 +6,7 @@
 from typing import Optional
 
 from app.domain.rag.base import EmbeddingProvider, Reranker
-from app.domain.rag.bm25 import BM25Retriever
+from app.domain.rag.retrieval.bm25 import BM25Retriever
 from app.infrastructure.vector_store.base import VectorStore
 
 

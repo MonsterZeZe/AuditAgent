@@ -11,8 +11,8 @@ import sys
 from pathlib import Path
 
 from app.core.logging.logger import setup_logging
-from app.domain.rag.embedding import OllamaEmbeddingProvider
-from app.domain.rag.ingestion import IngestionService
+from app.domain.rag.ingestion.service import IngestionService
+from app.domain.rag.retrieval.embedding import OllamaEmbeddingProvider
 from app.infrastructure.vector_store.chroma_store import ChromaVectorStore
 
 SUPPORTED_SUFFIXES = {".txt", ".md", ".markdown", ".pdf", ".docx"}

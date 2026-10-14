@@ -20,19 +20,35 @@ def get_llm():
     return create_llm_provider()
 
 
-@lru_cache
-def get_rag_engine():
-    from app.domain.rag.embedding import OllamaEmbeddingProvider
+def _build_engine(collection: str):
     from app.domain.rag.engine import RAGEngine
-    from app.domain.rag.reranker import CrossEncoderReranker
+    from app.domain.rag.retrieval.embedding import OllamaEmbeddingProvider
+    from app.domain.rag.retrieval.reranker import CrossEncoderReranker
     from app.infrastructure.vector_store.chroma_store import ChromaVectorStore
 
     vector_store = ChromaVectorStore()
     embedding = OllamaEmbeddingProvider()
     reranker = CrossEncoderReranker()
-    engine = RAGEngine(vector_store=vector_store, embedding=embedding, reranker=reranker)
+    engine = RAGEngine(
+        vector_store=vector_store,
+        embedding=embedding,
+        reranker=reranker,
+        collection=collection,
+    )
     engine.rebuild_bm25()  # 从向量库重建 BM25 索引
     return engine
+
+
+@lru_cache
+def get_law_engine():
+    """法规知识库检索引擎（审计准则、注册会计师法、财会法规）。"""
+    return _build_engine("regulatory_laws")
+
+
+@lru_cache
+def get_case_engine():
+    """判例知识库检索引擎（判决书、处罚案例）。"""
+    return _build_engine("case_library")
 
 
 @lru_cache

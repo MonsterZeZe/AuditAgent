@@ -2,7 +2,7 @@
 
 import pytest
 
-from app.domain.rag.splitter import TextSplitter
+from app.domain.rag.ingestion.splitters.text import TextSplitter
 
 
 def test_split_with_overlap() -> None:

@@ -11,4 +11,5 @@ def classify_intent(state: AgentState) -> AgentState:
     intent = router.classify(text)
     state["intent"] = intent
     state["route"] = intent["route"]
+    state["rag_target"] = intent.get("rag_target", "law")
     return state

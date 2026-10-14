@@ -26,6 +26,7 @@ class IntentResult(TypedDict):
     intent_type: Literal["knowledge_query", "tool_operation", "direct_qa", "unknown"]
     confidence: float
     route: Literal["rag", "tool", "direct"]
+    rag_target: NotRequired[Literal["law", "case", "both"]]
     sub_queries: NotRequired[list[str]]
     reason: NotRequired[str]
 
@@ -107,10 +108,12 @@ class AgentState(TypedDict, total=False):
     # 意图与路由
     intent: NotRequired[IntentResult]
     route: NotRequired[Literal["rag", "tool", "direct"]]
+    rag_target: NotRequired[Literal["law", "case", "both"]]
 
     # 检索
     retrieval_results: NotRequired[list[ScoredDoc]]
-    rag_context: NotRequired[RAGContext]
+    rag_context: NotRequired[RAGContext]       # 法规检索上下文
+    case_context: NotRequired[RAGContext]      # 判例检索上下文
 
     # 工具
     tool_calls: NotRequired[list[ToolCall]]
