@@ -41,9 +41,28 @@ class RAGEngine:
         self._bm25 = BM25Retriever(documents)
 
     def rebuild_bm25(self) -> None:
-        """从向量库读取全部文档，重建 BM25 索引。"""
-        documents = self._vector_store.get_documents(self._collection)
+        """重建 BM25 索引，优先加载磁盘缓存。"""
+        import os
+
+        from app.core.config.settings import get_settings
+
+        settings = get_settings()
+        cache_path = os.path.join(settings.bm25_cache_dir, f"{self._collection}.pkl")
+
+        if os.path.exists(cache_path):
+            try:
+                self._bm25 = BM25Retriever.load(cache_path)
+                return
+            except Exception:  # noqa: BLE001 - 缓存损坏则重建
+                pass
+
+        documents = self._vector_store.get_documents(
+            self._collection, max_documents=settings.max_bm25_documents
+        )
         self.set_documents(documents)
+        if self._bm25 is not None:
+            os.makedirs(settings.bm25_cache_dir, exist_ok=True)
+            self._bm25.save(cache_path)
 
     def retrieve(self, query: str, filters: Optional[dict] = None) -> dict:
         """执行二阶检索，返回检索结果与组装后的上下文。"""

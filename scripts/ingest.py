@@ -13,11 +13,11 @@ from pathlib import Path
 # 确保项目根目录在 sys.path 中，支持任意位置执行脚本
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.core.logging.logger import setup_logging
-from app.domain.rag.ingestion.service import IngestionService
-from app.domain.rag.ingestion.splitters.factory import get_collection_for_path
-from app.domain.rag.retrieval.embedding import OllamaEmbeddingProvider
-from app.infrastructure.vector_store.chroma_store import ChromaVectorStore
+from app.core.logging.logger import setup_logging  # noqa: E402
+from app.domain.rag.ingestion.service import IngestionService  # noqa: E402
+from app.domain.rag.ingestion.splitters.factory import get_collection_for_path  # noqa: E402
+from app.domain.rag.retrieval.embedding import SentenceTransformerEmbeddingProvider  # noqa: E402
+from app.infrastructure.vector_store.chroma_store import ChromaVectorStore  # noqa: E402
 
 SUPPORTED_SUFFIXES = {".txt", ".md", ".markdown", ".pdf", ".docx"}
 
@@ -49,7 +49,7 @@ def main() -> int:
     print(f"目标 Collection: {collection}")
 
     vector_store = ChromaVectorStore()
-    embedding = OllamaEmbeddingProvider()
+    embedding = SentenceTransformerEmbeddingProvider()
     service = IngestionService(
         vector_store=vector_store,
         embedding=embedding,

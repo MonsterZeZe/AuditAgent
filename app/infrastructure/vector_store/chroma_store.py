@@ -59,7 +59,28 @@ class ChromaVectorStore(VectorStore):
     def get_collection(self, collection: str) -> Any:
         return self._client.get_or_create_collection(name=collection)
 
-    def get_documents(self, collection: str) -> list[str]:
+    def get_documents(
+        self,
+        collection: str,
+        batch_size: int = 500,
+        max_documents: Optional[int] = None,
+    ) -> list[str]:
+        """分页读取集合内文档，避免一次性加载大集合，可限制最大条数。"""
         coll = self.get_collection(collection)
-        data = coll.get()
-        return data.get("documents") or []
+        documents: list[str] = []
+        offset = 0
+        while True:
+            if max_documents is not None and len(documents) >= max_documents:
+                break
+            limit = batch_size
+            if max_documents is not None:
+                limit = min(batch_size, max_documents - len(documents))
+            data = coll.get(limit=limit, offset=offset, include=["documents"])
+            batch = data.get("documents") or []
+            if not batch:
+                break
+            documents.extend(batch)
+            if len(batch) < limit:
+                break
+            offset += limit
+        return documents

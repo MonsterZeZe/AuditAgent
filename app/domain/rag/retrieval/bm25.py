@@ -1,6 +1,8 @@
 """BM25 关键词检索。"""
 
+import pickle
 import re
+from typing import cast
 
 from rank_bm25 import BM25Okapi
 
@@ -8,7 +10,7 @@ _TOKEN_PATTERN = re.compile(r"[\s,，。;；:：!！?？、()（）\[\]【】]+"
 
 
 class BM25Retriever:
-    """基于 BM25 的关键词检索。"""
+    """基于 BM25 的关键词检索，支持序列化缓存。"""
 
     def __init__(self, documents: list[str]) -> None:
         self._documents = documents
@@ -38,3 +40,14 @@ class BM25Retriever:
             for i in ranked
             if scores[i] > 0
         ]
+
+    def save(self, path: str) -> None:
+        """序列化 BM25 索引到磁盘。"""
+        with open(path, "wb") as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def load(cls, path: str) -> "BM25Retriever":
+        """从磁盘加载 BM25 索引。"""
+        with open(path, "rb") as f:
+            return cast("BM25Retriever", pickle.load(f))

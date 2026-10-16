@@ -40,5 +40,10 @@ class VectorStore(ABC):
         """获取集合句柄。"""
 
     @abstractmethod
-    def get_documents(self, collection: str) -> list[str]:
-        """获取集合内全部文档内容（用于 BM25 索引重建）。"""
+    def get_documents(
+        self,
+        collection: str,
+        batch_size: int = 500,
+        max_documents: Optional[int] = None,
+    ) -> list[str]:
+        """分页获取集合内文档内容（用于 BM25 索引重建），可限制最大条数。"""

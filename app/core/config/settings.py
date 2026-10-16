@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     api_model: str = "gpt-4o-mini"
 
     # 嵌入模型
-    embedding_model: str = "nomic-embed-text"
+    embedding_model: str = "bge-small-zh-v1.5"
 
     # 精排模型（CrossEncoder）
     reranker_model: str = "models/bge-reranker-base"
@@ -50,8 +50,15 @@ class Settings(BaseSettings):
     # 语义分块嵌入模型
     semantic_embedding_model: str = "models/bge-large-zh-v1.5"
 
+    # 检索/入库嵌入模型（向量库，本地 sentence-transformers）
+    embedding_model_path: str = "models/bge-small-zh-v1.5"
+
     # ChromaDB
     chroma_persist_dir: str = "./data/chroma"
+
+    # BM25 索引缓存
+    bm25_cache_dir: str = "./data/bm25_cache"
+    max_bm25_documents: int = 30000
 
     # 会话持久化
     session_db_path: str = "./data/sessions.db"

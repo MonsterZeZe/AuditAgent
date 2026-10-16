@@ -22,12 +22,12 @@ def get_llm():
 
 def _build_engine(collection: str):
     from app.domain.rag.engine import RAGEngine
-    from app.domain.rag.retrieval.embedding import OllamaEmbeddingProvider
+    from app.domain.rag.retrieval.embedding import SentenceTransformerEmbeddingProvider
     from app.domain.rag.retrieval.reranker import CrossEncoderReranker
     from app.infrastructure.vector_store.chroma_store import ChromaVectorStore
 
     vector_store = ChromaVectorStore()
-    embedding = OllamaEmbeddingProvider()
+    embedding = SentenceTransformerEmbeddingProvider()
     reranker = CrossEncoderReranker()
     engine = RAGEngine(
         vector_store=vector_store,

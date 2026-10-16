@@ -24,13 +24,13 @@ class OllamaEmbeddingProvider(EmbeddingProvider):
 
 
 class SentenceTransformerEmbeddingProvider(EmbeddingProvider):
-    """基于 sentence-transformers 的本地嵌入模型（bge-large-zh-v1.5）。"""
+    """基于 sentence-transformers 的本地嵌入模型（bge-small-zh-v1.5）。"""
 
     def __init__(self, model_path: str | None = None) -> None:
         if model_path is None:
             from app.core.config.settings import get_settings
 
-            model_path = get_settings().semantic_embedding_model
+            model_path = get_settings().embedding_model_path
         from sentence_transformers import SentenceTransformer
 
         self._model = SentenceTransformer(model_path)
