@@ -5,8 +5,9 @@ State 仅保留必要字段，大体积中间产物（检索结果、工具结�
 禁止在 State 中持有模型实例、连接句柄、文件句柄等对象。
 """
 
-from typing import Literal, TypedDict
+from typing import Annotated, Any, Literal, TypedDict
 
+from langgraph.graph.message import add_messages
 from typing_extensions import NotRequired
 
 
@@ -23,10 +24,10 @@ class Message(TypedDict):
 class IntentResult(TypedDict):
     """意图识别结果。"""
 
-    intent_type: Literal["knowledge_query", "tool_operation", "direct_qa", "unknown"]
+    intent_type: Literal["knowledge_query", "direct_qa", "unknown"]
     confidence: float
-    route: Literal["rag", "tool", "direct"]
-    rag_target: NotRequired[Literal["law", "case", "both"]]
+    route: Literal["rag", "direct"]
+    rag_targets: NotRequired[list[str]]
     sub_queries: NotRequired[list[str]]
     reason: NotRequired[str]
 
@@ -101,19 +102,22 @@ class AgentState(TypedDict, total=False):
     # 输入
     user_input: str
     normalized_input: NotRequired[str]
+    uploaded_files: NotRequired[list[str]]  # 当前会话上传的文件路径
 
-    # 对话历史（channel reducer: add_messages）
-    messages: list[Message]
+    # agent 循环消息（LangChain BaseMessage，reducer: add_messages）
+    messages: Annotated[list[Any], add_messages]
+
+    # 对话历史（dict 格式，会话持久化用）
+    chat_history: NotRequired[list[Message]]
 
     # 意图与路由
     intent: NotRequired[IntentResult]
-    route: NotRequired[Literal["rag", "tool", "direct"]]
-    rag_target: NotRequired[Literal["law", "case", "both"]]
+    route: NotRequired[Literal["rag", "direct"]]
+    rag_targets: NotRequired[list[str]]
 
     # 检索
     retrieval_results: NotRequired[list[ScoredDoc]]
-    rag_context: NotRequired[RAGContext]       # 法规检索上下文
-    case_context: NotRequired[RAGContext]      # 判例检索上下文
+    rag_contexts: NotRequired[dict[str, RAGContext]]  # {知识库标识: 检索上下文}
 
     # 工具
     tool_calls: NotRequired[list[ToolCall]]

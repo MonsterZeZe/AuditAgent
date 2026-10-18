@@ -1,7 +1,7 @@
 """意图识别模块。
 
-规则优先：关键词快速分类意图，并对 RAG 查询做子路由
-（法规知识库 / 判例知识库 / 双路），硬规则命中即跳过 LLM，节省开销。
+仅负责 RAG 子路由：判断用户查询应检索哪些知识库（法规/判例/双路）。
+工具调用由 LLM 通过 @tool 自主决策，不经过意图识别。
 """
 
 from graph.state import IntentResult
@@ -42,18 +42,6 @@ _CASE_KEYWORDS = (
     "失败案例",
 )
 
-_TOOL_KEYWORDS = (
-    "计算",
-    "比对",
-    "校验",
-    "核算",
-    "勾稽",
-    "生成报告",
-    "导出",
-    "汇总",
-    "分析报表",
-)
-
 _KNOWLEDGE_KEYWORDS = (
     "查",
     "检索",
@@ -68,19 +56,10 @@ _KNOWLEDGE_KEYWORDS = (
 
 
 class IntentRouter:
-    """意图识别器（规则实现）。"""
+    """意图识别器（规则实现，仅负责 RAG 子路由）。"""
 
     def classify(self, text: str) -> IntentResult:
-        """对输入文本分类，返回意图、路由与 RAG 子路由目标。"""
-        for kw in _TOOL_KEYWORDS:
-            if kw in text:
-                return {
-                    "intent_type": "tool_operation",
-                    "confidence": 0.9,
-                    "route": "tool",
-                    "reason": f"命中工具关键词: {kw}",
-                }
-
+        """对输入文本分类，返回需要检索的知识库列表与置信度。"""
         has_law = any(k in text for k in _LAW_KEYWORDS)
         has_case = any(k in text for k in _CASE_KEYWORDS)
 
@@ -89,7 +68,7 @@ class IntentRouter:
                 "intent_type": "knowledge_query",
                 "confidence": 0.9,
                 "route": "rag",
-                "rag_target": "both",
+                "rag_targets": ["law", "case"],
                 "reason": "同时命中法规与判例关键词",
             }
         if has_law:
@@ -97,7 +76,7 @@ class IntentRouter:
                 "intent_type": "knowledge_query",
                 "confidence": 0.85,
                 "route": "rag",
-                "rag_target": "law",
+                "rag_targets": ["law"],
                 "reason": "命中法规关键词",
             }
         if has_case:
@@ -105,7 +84,7 @@ class IntentRouter:
                 "intent_type": "knowledge_query",
                 "confidence": 0.85,
                 "route": "rag",
-                "rag_target": "case",
+                "rag_targets": ["case"],
                 "reason": "命中判例关键词",
             }
 
@@ -113,15 +92,14 @@ class IntentRouter:
             if kw in text:
                 return {
                     "intent_type": "knowledge_query",
-                    "confidence": 0.7,
+                    "confidence": 0.5,
                     "route": "rag",
-                    "rag_target": "law",
-                    "reason": f"命中知识关键词: {kw}",
+                    "reason": f"命中知识关键词: {kw}（低置信度，需 LLM 决策知识库）",
                 }
 
         return {
             "intent_type": "direct_qa",
             "confidence": 0.6,
             "route": "direct",
-            "reason": "默认直接问答",
+            "reason": "默认直接问答（工具调用由 LLM 自主决策）",
         }

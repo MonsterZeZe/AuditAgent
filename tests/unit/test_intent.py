@@ -11,10 +11,11 @@ def test_knowledge_query() -> None:
 
 
 def test_tool_operation() -> None:
+    # 工具操作不再由意图识别判断，交由 LLM 自主决策，路由为 direct
     router = IntentRouter()
     result = router.classify("帮我计算这个报表的勾稽关系")
-    assert result["route"] == "tool"
-    assert result["intent_type"] == "tool_operation"
+    assert result["route"] == "direct"
+    assert result["intent_type"] == "direct_qa"
 
 
 def test_direct_qa() -> None:

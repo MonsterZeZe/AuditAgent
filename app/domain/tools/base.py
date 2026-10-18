@@ -6,14 +6,14 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 
 @dataclass
 class ToolResult:
     """工具执行结果（运行时对象）。"""
 
-    status: str  # success / failed
+    status: Literal["success", "failed"]
     output: dict = field(default_factory=dict)
     error: str = ""
 

@@ -7,6 +7,7 @@
     streamlit run streamlit_app.py
 """
 
+from pathlib import Path
 from uuid import uuid4
 
 import streamlit as st
@@ -42,6 +43,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "followup_context" not in st.session_state:
     st.session_state.followup_context = None
+if "uploaded_files" not in st.session_state:
+    st.session_state.uploaded_files = []
 
 session_manager = get_session_manager()
 memory_store = get_memory_store()
@@ -59,6 +62,25 @@ def switch_session(session_id: str) -> None:
 
 # ---- 侧边栏 ----
 with st.sidebar:
+    st.header("📤 文件上传")
+    uploaded_file = st.file_uploader(
+        "上传文件到 uploader 目录",
+        type=["txt", "pdf", "docx", "md", "markdown"],
+    )
+    if uploaded_file is not None:
+        save_dir = Path("uploader")
+        save_dir.mkdir(exist_ok=True)
+        # 加时间戳前缀，避免重名覆盖，并保留原文件名
+        from datetime import datetime
+
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        save_path = save_dir / f"{timestamp}_{uploaded_file.name}"
+        save_path.write_bytes(uploaded_file.getbuffer())
+        st.session_state.uploaded_files.append(str(save_path))
+        st.success(f"已保存: {save_path.name}")
+
+    st.divider()
+
     st.header("⚙️ 会话设置")
     user_id = st.text_input("用户 ID", value="streamlit-user")
     if st.button("🔄 新建会话"):
@@ -158,8 +180,9 @@ if question:
         "session_id": session_id,
         "trace_id": uuid4().hex,
         "user_id": user_id,
-        "messages": history,
+        "chat_history": history,
         "long_term_memory": memories,
+        "uploaded_files": st.session_state.get("uploaded_files", []),
     }
 
     with st.spinner("思考中..."):

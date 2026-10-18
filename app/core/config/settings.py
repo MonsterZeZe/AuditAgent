@@ -28,7 +28,7 @@ class Settings(BaseSettings):
 
     # 模型（Ollama）
     ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "gemma3:4b"
+    ollama_model: str = "qwen3.5:2b"
     model_temperature: float = 0.2
     model_top_p: float = 0.9
     model_max_tokens: int = 2048

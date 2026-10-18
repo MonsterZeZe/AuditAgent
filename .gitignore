@@ -29,6 +29,7 @@ env/
 data/
 models/
 dataset/
+uploader/
 
 # ===== 缓存与测试产物 =====
 .pytest_cache/

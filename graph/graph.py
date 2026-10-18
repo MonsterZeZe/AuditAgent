@@ -1,57 +1,55 @@
-"""LangGraph 状态机组装（含能力型子图）。
+"""LangGraph 状态机组装。
 
-主图调度能力子图：RAG 检索细分为法规知识库、判例知识库、双路检索，
-工具执行、结果校验各自封装为子图，为多智能体演进预留边界。
+图结构：
+    preprocess → first_agent → intent → retrieval → generate → validation
+                    ↑            ↓
+                  tool_node ←（first_agent 有 tool_calls 时）
+                              intent → generate（无需检索时）
 """
 
 from langgraph.graph import END, StateGraph
+from langgraph.prebuilt import ToolNode
 
-from graph.edges.routes import route_intent, should_retry
+from app.domain.tools.langchain_tools import LANGCHAIN_TOOLS
+from graph.edges.routes import should_call_tool, should_retrieve, should_retry
+from graph.nodes.first_agent import first_agent
 from graph.nodes.generate import generate
 from graph.nodes.intent import classify_intent
 from graph.nodes.preprocess import preprocess
-from graph.nodes.retrieval import (
-    build_both_rag_subgraph,
-    build_case_rag_subgraph,
-    build_law_rag_subgraph,
-)
-from graph.nodes.tool import build_tool_subgraph
+from graph.nodes.retrieval import build_retrieval_subgraph
 from graph.nodes.validation import build_validation_subgraph, save_checkpoint
 from graph.state import AgentState
 
 
 def build_graph():
-    """构建 Agent 状态机（主图调度能力子图）。"""
+    """构建 Agent 状态机。"""
     builder = StateGraph(AgentState)
 
     builder.add_node("preprocess", preprocess)
-    builder.add_node("classify_intent", classify_intent)
-    builder.add_node("law_rag", build_law_rag_subgraph())
-    builder.add_node("case_rag", build_case_rag_subgraph())
-    builder.add_node("both_rag", build_both_rag_subgraph())
-    builder.add_node("tool", build_tool_subgraph())
+    builder.add_node("first_agent", first_agent)
+    builder.add_node("tool_node", ToolNode(LANGCHAIN_TOOLS))
+    builder.add_node("intent", classify_intent)
+    builder.add_node("retrieval", build_retrieval_subgraph())
     builder.add_node("generate", generate)
     builder.add_node("validation", build_validation_subgraph())
     builder.add_node("save_checkpoint", save_checkpoint)
 
     builder.set_entry_point("preprocess")
-    builder.add_edge("preprocess", "classify_intent")
+    builder.add_edge("preprocess", "first_agent")
 
     builder.add_conditional_edges(
-        "classify_intent",
-        route_intent,
-        {
-            "law": "law_rag",
-            "case": "case_rag",
-            "both": "both_rag",
-            "tool": "tool",
-            "direct": "generate",
-        },
+        "first_agent",
+        should_call_tool,
+        {"tools": "tool_node", "intent": "intent"},
     )
-    builder.add_edge("law_rag", "generate")
-    builder.add_edge("case_rag", "generate")
-    builder.add_edge("both_rag", "generate")
-    builder.add_edge("tool", "generate")
+    builder.add_edge("tool_node", "first_agent")
+
+    builder.add_conditional_edges(
+        "intent",
+        should_retrieve,
+        {"retrieve": "retrieval", "generate": "generate"},
+    )
+    builder.add_edge("retrieval", "generate")
     builder.add_edge("generate", "validation")
 
     builder.add_conditional_edges(

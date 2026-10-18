@@ -49,7 +49,7 @@ def chat(req: ChatRequest) -> ChatResponse:
         "session_id": session_id,
         "trace_id": trace_id,
         "user_id": user_id,
-        "messages": history,
+        "chat_history": history,
         "long_term_memory": memories,
     }
     result = _orchestrator.invoke(initial_state)

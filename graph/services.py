@@ -5,6 +5,12 @@
 
 from functools import lru_cache
 
+# 知识库标识 → ChromaDB Collection 映射（后续新增知识库在此扩展）
+KNOWLEDGE_BASES = {
+    "law": "regulatory_laws",
+    "case": "case_library",
+}
+
 
 @lru_cache
 def get_intent_router():
@@ -14,10 +20,10 @@ def get_intent_router():
 
 
 @lru_cache
-def get_llm():
-    from app.infrastructure.llm.factory import create_llm_provider
+def get_injection_detector():
+    from app.domain.validator.injection import InjectionDetector
 
-    return create_llm_provider()
+    return InjectionDetector()
 
 
 def _build_engine(collection: str):
@@ -40,29 +46,7 @@ def _build_engine(collection: str):
 
 
 @lru_cache
-def get_law_engine():
-    """法规知识库检索引擎（审计准则、注册会计师法、财会法规）。"""
-    return _build_engine("regulatory_laws")
-
-
-@lru_cache
-def get_case_engine():
-    """判例知识库检索引擎（判决书、处罚案例）。"""
-    return _build_engine("case_library")
-
-
-@lru_cache
-def get_injection_detector():
-    from app.domain.validator.injection import InjectionDetector
-
-    return InjectionDetector()
-
-
-@lru_cache
-def get_tool_registry():
-    from app.domain.tools.compliance import ComplianceCheckTool
-    from app.domain.tools.registry import ToolRegistry
-
-    registry = ToolRegistry()
-    registry.register(ComplianceCheckTool())
-    return registry
+def get_engine(target: str):
+    """按知识库标识（law/case）获取对应的检索引擎。"""
+    collection = KNOWLEDGE_BASES[target]
+    return _build_engine(collection)

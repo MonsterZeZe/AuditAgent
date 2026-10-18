@@ -1,18 +1,18 @@
-"""RAG 检索节点与子图（法规 / 判例 双知识库）。"""
+"""RAG 检索节点（按知识库列表检索）。"""
 
 import logging
 from typing import Any, cast
 
 from langgraph.graph import END, StateGraph
 
-from graph.services import get_case_engine, get_law_engine
+from graph.services import get_engine
 from graph.state import AgentState, RAGContext
 
 logger = logging.getLogger(__name__)
 
 
 def _retrieve(engine: Any, state: AgentState) -> RAGContext:
-    """通用检索：调用引擎返回结果，失败降级为空上下文。"""
+    """调用引擎检索，失败降级为空上下文。"""
     try:
         query = state.get("normalized_input", "") or state.get("user_input", "")
         result = engine.retrieve(query)
@@ -22,47 +22,20 @@ def _retrieve(engine: Any, state: AgentState) -> RAGContext:
         return {"chunks": [], "sources": [], "assembled_prompt": ""}
 
 
-def retrieve_law(state: AgentState) -> AgentState:
-    """法规知识库检索：审计准则、注册会计师法、财会法规。"""
-    state["rag_context"] = _retrieve(get_law_engine(), state)
+def retrieve(state: AgentState) -> AgentState:
+    """根据 rag_targets 列表检索对应知识库，结果存入 rag_contexts。"""
+    targets = state.get("rag_targets") or ["law"]
+    contexts: dict[str, RAGContext] = {}
+    for target in targets:
+        contexts[target] = _retrieve(get_engine(target), state)
+    state["rag_contexts"] = contexts
     return state
 
 
-def retrieve_case(state: AgentState) -> AgentState:
-    """判例知识库检索：判决书、处罚案例。"""
-    state["case_context"] = _retrieve(get_case_engine(), state)
-    return state
-
-
-def retrieve_both(state: AgentState) -> AgentState:
-    """法规 + 判例 双路检索。"""
-    state = retrieve_law(state)
-    state = retrieve_case(state)
-    return state
-
-
-def build_law_rag_subgraph():
-    """法规 RAG 检索子图。"""
+def build_retrieval_subgraph():
+    """RAG 检索子图。"""
     builder = StateGraph(AgentState)
-    builder.add_node("retrieve_law", retrieve_law)
-    builder.set_entry_point("retrieve_law")
-    builder.add_edge("retrieve_law", END)
-    return builder.compile()
-
-
-def build_case_rag_subgraph():
-    """判例 RAG 检索子图。"""
-    builder = StateGraph(AgentState)
-    builder.add_node("retrieve_case", retrieve_case)
-    builder.set_entry_point("retrieve_case")
-    builder.add_edge("retrieve_case", END)
-    return builder.compile()
-
-
-def build_both_rag_subgraph():
-    """法规 + 判例 双路检索子图。"""
-    builder = StateGraph(AgentState)
-    builder.add_node("retrieve_both", retrieve_both)
-    builder.set_entry_point("retrieve_both")
-    builder.add_edge("retrieve_both", END)
+    builder.add_node("retrieve", retrieve)
+    builder.set_entry_point("retrieve")
+    builder.add_edge("retrieve", END)
     return builder.compile()
