@@ -207,6 +207,3 @@ mypy app graph scripts main.py tests
 - **知识库扩展**：新增知识库只需在 `graph/services.py` 的 `KNOWLEDGE_BASES` 添加映射，并在 `intent/router.py` 添加触发词。
 - **工具扩展**：新增工具用 `@tool` 装饰器定义，加入 `langchain_tools.py` 的 `LANGCHAIN_TOOLS` 列表即可。
 
-## 架构设计文档
-
-完整架构设计见 [架构设计.md](架构设计.md) 与 [架构设计-章节细化.md](架构设计-章节细化.md)。
