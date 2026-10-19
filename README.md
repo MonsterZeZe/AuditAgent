@@ -1,10 +1,10 @@
-# 审计领域智能 Agent 系统
+# 审计领域 Agent 系统
 
 > **作者**：MonsterZeZe
-> **仓库**：https://github.com/MonsterZeZe/auditllmforagent
+> **仓库**：https://github.com/MonsterZeZe/AuditAgent
 > **许可**：Apache-2.0（使用须保留作者署名，详见 [LICENSE](LICENSE) 与 [NOTICE](NOTICE)）
 
-面向审计领域的智能 Agent 系统，结合双 RAG 知识库与本地大模型，实现**审计问答、合规校验、文档分析、风险识别、财务计算、底稿生成**等核心能力。系统采用模块化分层设计，支持全链路可追溯、可监控、可断点恢复，满足审计场景对数据安全、结果可信、过程可审计的强需求。
+面向审计领域的 Agent 系统，结合双 RAG 知识库与本地大模型，实现**审计问答、合规校验、文档分析、风险识别、财务计算、底稿生成**等核心能力。系统采用模块化分层设计，支持全链路可追溯、可监控、可断点恢复，满足审计场景对数据安全、结果可信、过程可审计的强需求。
 
 ## 核心特性
 
@@ -214,7 +214,7 @@ mypy app graph scripts main.py tests
 ## 作者与许可
 
 - **作者**：MonsterZeZe
-- **仓库**：https://github.com/MonsterZeZe/auditllmforagent
+- **仓库**：https://github.com/MonsterZeZe/AuditAgent
 - **许可证**：[Apache-2.0](LICENSE)
 
 ### 使用与署名要求
@@ -223,11 +223,9 @@ mypy app graph scripts main.py tests
 
 1. 任何使用、复制、修改、分发必须保留版权声明、作者信息（MonsterZeZe）与原始仓库地址。
 2. 不得移除或篡改 `LICENSE`、`NOTICE` 文件及源码中的版权头。
-3. 基于本项目开发衍生作品，须在显著位置注明"基于 MonsterZeZe 的审计领域智能 Agent 系统开发"。
+3. 基于本项目开发衍生作品，须在显著位置注明"基于 MonsterZeZe 的审计领域 Agent 系统开发"。
 
 ### 商业使用说明
 
 Apache-2.0 允许商业使用，但**必须保留作者署名与来源**。若需去除署名、闭源分发或商业授权，请联系作者另行授权。
-
-> ⚠️ 如需更强的防盗卖保护（要求衍生作品开源，阻止闭源盗卖），建议改用 **AGPL-3.0** 或专有许可。
 

@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "审计领域 Agent 系统 (audit-agent)"
+abstract: "面向审计领域的智能 Agent 系统，结合双 RAG 知识库与本地大模型，实现审计问答、合规校验、文档分析、风险识别、财务计算、底稿生成等能力。"
+authors:
+  - alias: "MonsterZeZe"
+    family-names: "MonsterZeZe"
+repository-code: "https://github.com/MonsterZeZe/AuditAgent"
+license: Apache-2.0
+version: 0.1.0
+date-released: "2026-10-19"
+keywords:
+  - audit
+  - langgraph
+  - rag
+  - llm
+  - chromadb

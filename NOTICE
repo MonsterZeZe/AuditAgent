@@ -1,0 +1,30 @@
+审计领域 Agent 系统 (audit-agent)
+Copyright 2026 MonsterZeZe
+All rights reserved.
+
+Author:        MonsterZeZe
+Repository:    https://github.com/MonsterZeZe/AuditAgent
+
+This product includes software developed by MonsterZeZe.
+Licensed under the Apache License, Version 2.0 (the "License").
+You may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+------------------------------------------------------------------------
+使用与署名要求 / Attribution Requirements
+
+1. 任何对本项目的使用、复制、修改、分发，必须保留本项目的版权声明、
+   作者信息（MonsterZeZe）、本项目名称与原始仓库地址。
+2. 不得移除或篡改本 NOTICE 文件、LICENSE 文件及源码中的版权头。
+3. 如基于本项目开发衍生作品，必须在显著位置注明"基于 MonsterZeZe 的
+   审计领域 Agent 系统开发"。
+4. 禁止将本项目或其衍生作品作为自有原创产品进行商业售卖而不注明来源。
+------------------------------------------------------------------------

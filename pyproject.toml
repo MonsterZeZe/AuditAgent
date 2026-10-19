@@ -5,15 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "audit-agent"
 version = "0.1.0"
-description = "审计领域智能 Agent 系统（LangChain + LangGraph + ChromaDB + Ollama）"
+description = "审计领域 Agent 系统（LangChain + LangGraph + ChromaDB + Ollama）"
 authors = [{ name = "MonsterZeZe" }]
 license = { text = "Apache-2.0" }
 readme = "README.md"
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/MonsterZeZe/auditllmforagent"
-Repository = "https://github.com/MonsterZeZe/auditllmforagent"
+Homepage = "https://github.com/MonsterZeZe/AuditAgent"
+Repository = "https://github.com/MonsterZeZe/AuditAgent"
 dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.29",
