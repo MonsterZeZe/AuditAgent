@@ -61,48 +61,43 @@ class InvoiceOcrTool(Tool):
 
     @staticmethod
     def _parse_invoice(text: str) -> dict:
-        """从发票文本中提取关键字段。"""
+        """从发票文本中提取关键字段（兼容标签配对与扫描件乱序两种布局）。"""
         invoice: dict = {}
+        flat = " ".join(line.strip() for line in text.split("\n") if line.strip())
 
-        m = re.search(r"发票号码[:：]?\s*([0-9]{8,20})", text)
+        # 发票号码：标签配对优先，否则取 20 位/18 位纯数字
+        m = re.search(r"发票号码[^\d]*(\d{18,20})", flat)
         if m:
             invoice["invoice_number"] = m.group(1)
+        else:
+            m = re.search(r"(?<!\d)(\d{20})(?!\d)", flat) or re.search(
+                r"(?<!\d)(\d{18})(?!\d)", flat
+            )
+            if m:
+                invoice["invoice_number"] = m.group(1)
 
-        m = re.search(r"发票代码[:：]?\s*([0-9]{10,12})", text)
-        if m:
-            invoice["invoice_code"] = m.group(1)
-
-        m = re.search(r"开票日期[:：]?\s*(\d{4})年(\d{1,2})月(\d{1,2})日", text)
+        # 开票日期
+        m = re.search(r"(\d{4})年(\d{1,2})月(\d{1,2})日", flat)
         if m:
             invoice["issue_date"] = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
 
-        m = re.search(r"购买方名称[:：]?\s*([^\n:：]+)", text)
+        # 统一社会信用代码（18 位含字母，排除纯数字的发票号码）
+        codes = re.findall(r"(?<!\w)([0-9A-Z]{18})(?!\w)", flat)
+        letter_codes = [c for c in codes if any(ch.isalpha() for ch in c)]
+        if letter_codes:
+            invoice["credit_code"] = letter_codes[0]
+
+        # 金额（¥/￥ 后的小数金额，取最大作为价税合计）
+        amounts = re.findall(r"[¥￥]\s*([0-9,]+\.\d{2})", flat)
+        if amounts:
+            invoice["total_amount"] = f"{max(float(a.replace(',', '')) for a in amounts):.2f}"
+
+        # 购买方/销售方名称（标签配对，兼容"名称："与"名称"）
+        m = re.search(r"购买方(?:信息)?名称[：:]?\s*([^\n:：]+)", flat)
         if m and m.group(1).strip():
             invoice["buyer_name"] = m.group(1).strip()
-
-        m = re.search(r"销售方名称[:：]?\s*([^\n:：]+)", text)
+        m = re.search(r"销售方(?:信息)?名称[：:]?\s*([^\n:：]+)", flat)
         if m and m.group(1).strip():
             invoice["seller_name"] = m.group(1).strip()
-
-        for label, key in (("购买方", "buyer_tax_no"), ("销售方", "seller_tax_no")):
-            m = re.search(rf"{label}.*?纳税人识别号[:：]?\s*([0-9A-Za-z]{{15,20}})", text, re.DOTALL)
-            if m:
-                invoice[key] = m.group(1)
-
-        m = re.search(r"统一社会信用代码[:：]?\s*([0-9A-Za-z]{18})", text)
-        if m:
-            invoice["credit_code"] = m.group(1)
-
-        m = re.search(r"价税合计[（(]?[^（(]*[）)]?[:：]?\s*[¥￥]?\s*([0-9,]+\.?\d*)", text)
-        if m:
-            invoice["total_amount"] = m.group(1).replace(",", "")
-        else:
-            m = re.search(r"票价[:：]?\s*[¥￥]?\s*([0-9,]+\.?\d*)", text)
-            if m:
-                invoice["total_amount"] = m.group(1).replace(",", "")
-
-        m = re.search(r"税额[:：]?\s*[¥￥]?\s*([0-9,]+\.?\d*)", text)
-        if m:
-            invoice["tax_amount"] = m.group(1).replace(",", "")
 
         return invoice
