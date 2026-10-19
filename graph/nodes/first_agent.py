@@ -8,10 +8,12 @@ from app.domain.tools.langchain_tools import LANGCHAIN_TOOLS
 from graph.state import AgentState
 
 _SYSTEM_PROMPT = (
-    "你是一名专业的审计助手，回答需严谨、可追溯。"
-    "若用户请求计算、生成底稿、识别发票等操作，请调用相应工具。"
+    "你是一名专业的审计助手。当用户请求以下操作时，必须调用对应工具，不要直接回答：\n"
+    "1. 识别发票、提取发票信息 → 调用 invoice_ocr 工具\n"
+    "2. 生成审计底稿、审定表、明细表、询证函 → 调用 working_paper_generator 工具\n"
+    "3. 财务计算、勾稽校验、差异计算、计提/折旧/税费测算 → 调用 arithmetic_validator 工具\n"
+    "只有与上述工具无关的问题才直接回答。"
 )
-_MAX_TOOL_ROUNDS = 3
 
 
 def first_agent(state: AgentState) -> AgentState:
@@ -32,14 +34,12 @@ def first_agent(state: AgentState) -> AgentState:
             ),
         ]
 
-    # 统计已执行的工具轮数，超限则不再调用工具
-    tool_rounds = sum(1 for m in messages if getattr(m, "type", "") == "tool")
+    # 已有工具执行结果（ToolMessage）时，不再调用工具，交由 generate 生成最终回答
+    has_tool_result = any(getattr(m, "type", "") == "tool" for m in messages)
+    if has_tool_result:
+        return {}
 
     settings = get_settings()
     llm = ChatOllama(model=settings.ollama_model, temperature=settings.model_temperature)
-    if tool_rounds >= _MAX_TOOL_ROUNDS:
-        response = llm.invoke(messages)
-    else:
-        response = llm.bind_tools(LANGCHAIN_TOOLS).invoke(messages)
-
+    response = llm.bind_tools(LANGCHAIN_TOOLS).invoke(messages)
     return {"messages": [response]}
