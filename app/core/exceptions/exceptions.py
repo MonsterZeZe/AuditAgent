@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """统一异常定义与错误码。
 
 所有业务异常继承 AppException，携带标准错误码，便于全局异常处理层

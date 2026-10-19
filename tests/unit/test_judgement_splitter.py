@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """JudgementSplitter 结构化分块单元测试。"""
 
 from app.domain.rag.ingestion.splitters.judgement import JudgementSplitter

@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """first_agent 节点：LLM bind_tools，自主决策是否调用工具。"""
 
 from langchain_core.messages import HumanMessage, SystemMessage

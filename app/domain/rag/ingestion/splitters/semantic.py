@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """语义分块器。
 
 用嵌入模型计算相邻句子的语义相似度，在相似度骤降处切分，

@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """长期记忆存储（SQLite 持久化）。
 
 记忆分类对应 MemoryType 枚举：用户画像 / 领域知识 / 任务历史。

@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """会话管理（SQLite 持久化）。
 
 会话生命周期：创建 → 激活 → 挂起 → 归档 → 销毁。

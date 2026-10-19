@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """API 大模型适配器（OpenAI 兼容）。
 
 支持任意 OpenAI 兼容的远程模型服务（OpenAI / DeepSeek / 通义千问 / vLLM 等），

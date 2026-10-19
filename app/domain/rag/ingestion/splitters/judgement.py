@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """判决书 / 政策解读结构化分块器。
 
 按"一、二、"等分点标题切分（支持行内分点），并清理网页抓取残留。

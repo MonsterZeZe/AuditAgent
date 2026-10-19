@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """大模型接入抽象接口。
 
 定义统一 LLM 接口，彻底屏蔽底层模型实现差异。当前由 Ollama 实现，

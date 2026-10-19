@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """意图识别模块。
 
 仅负责 RAG 子路由：判断用户查询应检索哪些知识库（法规/判例/双路）。

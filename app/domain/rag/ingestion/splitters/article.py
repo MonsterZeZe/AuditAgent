@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """按"条"分块器（针对法律法规）。
 
 识别"第X条"作为语义边界，每条条文作为独立分块，

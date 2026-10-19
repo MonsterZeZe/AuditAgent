@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """SQLite 持久化基类。
 
 统一连接管理、建表与时间戳，子类只需声明建表 DDL 与业务方法，

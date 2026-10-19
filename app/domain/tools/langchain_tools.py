@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """LangChain @tool 包装。
 
 将领域工具包装为 LangChain tool，供 LLM function calling 与 ToolNode 使用。

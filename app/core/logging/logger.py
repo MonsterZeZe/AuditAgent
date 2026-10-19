@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """结构化 JSON 日志。
 
 统一日志格式，支持控制台（开发）与文件滚动（生产）双通道输出，

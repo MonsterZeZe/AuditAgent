@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """底稿生成工具。
 
 根据科目、审定表数据、审计程序与发现事项，生成 Markdown 底稿框架，

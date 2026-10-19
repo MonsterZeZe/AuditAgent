@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """数据接入服务。
 
 文档加载 → 分块 → 嵌入 → 入库（ChromaDB）。入库以文档 ID 为幂等键，

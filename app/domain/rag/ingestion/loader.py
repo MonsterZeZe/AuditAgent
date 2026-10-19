@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """文档加载器。
 
 支持 TXT / PDF / DOCX 多格式，返回纯文本。各格式依赖采用懒加载，

@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """向量库抽象接口。
 
 定义统一的向量检索与数据入库接口，屏蔽 ChromaDB 等具体实现，

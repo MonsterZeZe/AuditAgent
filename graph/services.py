@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """服务懒加载单例。
 
 节点通过懒加载获取领域层服务，避免启动时建立重资源连接。

@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """core.constants 与 core.exceptions 单元测试示例。"""
 
 from app.core.constants.constants import Route, SecurityLevel, UserRole

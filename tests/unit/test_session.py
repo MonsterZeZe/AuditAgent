@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """SessionManager（SQLite 持久化）单元测试。"""
 
 from app.application.session.session import SessionManager

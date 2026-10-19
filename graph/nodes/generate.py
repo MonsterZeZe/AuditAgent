@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """推理生成节点（基于 messages 含工具结果 + RAG 上下文生成回答）。"""
 
 from typing import Any

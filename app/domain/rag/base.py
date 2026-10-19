@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """RAG 领域接口定义。
 
 定义嵌入生成与精排重排序的统一接口，实现为独立组件，可通过配置自由切换。

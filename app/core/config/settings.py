@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """应用配置管理。
 
 基于 pydantic-settings 从环境变量与 .env 文件加载配置，实现环境差异化隔离。

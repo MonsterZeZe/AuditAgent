@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """OCR 发票识别工具。
 
 从 PDF 发票中提取文本并解析关键字段，整理为 JSON 输出。

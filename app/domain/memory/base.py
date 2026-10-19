@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """记忆系统抽象接口。
 
 统一记忆读写接口，所有 Agent 必须通过记忆网关访问记忆系统，

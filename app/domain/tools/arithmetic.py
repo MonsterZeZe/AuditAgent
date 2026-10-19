@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """财务计算校验工具。
 
 支持重算（坏账计提、折旧摊销、存货跌价、税费测算、商誉减值）、

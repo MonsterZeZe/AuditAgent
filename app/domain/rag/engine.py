@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """RAG 检索引擎（二阶检索）。
 
 全链路：查询嵌入 → 多路召回（向量 + BM25）→ 加权融合去重 → 精排 → 上下文组装。

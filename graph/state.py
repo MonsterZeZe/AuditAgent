@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """LangGraph Agent 状态契约定义。
 
 State 仅保留必要字段，大体积中间产物（检索结果、工具结果）按需持久化，

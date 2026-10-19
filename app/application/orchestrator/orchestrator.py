@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """Agent 编排器。
 
 驱动 LangGraph 状态机，管理节点执行、条件路由、重试与断点恢复。

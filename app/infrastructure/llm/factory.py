@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """模型接入工厂。
 
 根据配置选择模型来源：本地 Ollama 或远程 OpenAI 兼容 API。

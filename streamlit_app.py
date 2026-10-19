@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """审计智能助手 - Streamlit 交互页面。
 
 侧边栏可视化展示短期记忆（当前会话）与长期记忆（跨会话），

@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """SqliteMemoryStore 长期记忆单元测试。"""
 
 from app.domain.memory.store import SqliteMemoryStore

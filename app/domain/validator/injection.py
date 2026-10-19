@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """Prompt 注入检测。
 
 基于规则识别越狱指令、系统指令覆盖、提示泄露与检索篡改等攻击。

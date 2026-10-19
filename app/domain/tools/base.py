@@ -1,3 +1,7 @@
+# Copyright 2026 MonsterZeZe
+# Licensed under the Apache License, Version 2.0
+# Repository: https://github.com/MonsterZeZe/AuditAgent
+
 """审计工具抽象接口。
 
 工具遵循统一插件规范，新增审计工具（合规校验、财务计算、数据比对等）
