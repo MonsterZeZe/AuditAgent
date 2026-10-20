@@ -20,7 +20,7 @@ _SYSTEM_PROMPT = (
 )
 
 
-def first_agent(state: AgentState) -> AgentState:
+async def first_agent(state: AgentState) -> AgentState:
     """LLM bind_tools，判断是否调用工具，返回 AIMessage（可能含 tool_calls）。"""
     messages = list(state.get("messages") or [])
     if not messages:
@@ -45,5 +45,5 @@ def first_agent(state: AgentState) -> AgentState:
 
     settings = get_settings()
     llm = ChatOllama(model=settings.ollama_model, temperature=settings.model_temperature)
-    response = llm.bind_tools(LANGCHAIN_TOOLS).invoke(messages)
+    response = await llm.bind_tools(LANGCHAIN_TOOLS).ainvoke(messages)
     return {"messages": [response]}

@@ -39,7 +39,7 @@ def _build_sources(state: Any) -> list[SourceInfo]:
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(req: ChatRequest) -> ChatResponse:
+async def chat(req: ChatRequest) -> ChatResponse:
     """执行一次审计问答。"""
     user_id = req.user_id or "anonymous"
     trace_id = uuid4().hex
@@ -56,7 +56,7 @@ def chat(req: ChatRequest) -> ChatResponse:
         "chat_history": history,
         "long_term_memory": memories,
     }
-    result = _orchestrator.invoke(initial_state)
+    result = await _orchestrator.ainvoke(initial_state)
     _session_manager.append(session_id, "user", req.question)
     _session_manager.append(session_id, "assistant", result.get("generation", ""))
     _memory_store.add_memory(

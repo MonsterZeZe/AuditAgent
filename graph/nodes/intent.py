@@ -10,7 +10,7 @@ from graph.services import get_intent_router
 from graph.state import AgentState
 
 
-def _llm_rag_routing(query: str) -> Optional[list[str]]:
+async def _llm_rag_routing(query: str) -> Optional[list[str]]:
     """LLM 决策 RAG 子路由（知识库列表），文本 JSON 输出。"""
     import json
     import re
@@ -29,7 +29,7 @@ def _llm_rag_routing(query: str) -> Optional[list[str]]:
 
     try:
         llm = ChatOllama(model=get_settings().ollama_model, temperature=0)
-        response = llm.invoke([{"role": "user", "content": prompt}])
+        response = await llm.ainvoke([{"role": "user", "content": prompt}])
         text = getattr(response, "content", "")
         match = re.search(r"\{.*\}", text, re.DOTALL)
         if not match:
@@ -43,7 +43,7 @@ def _llm_rag_routing(query: str) -> Optional[list[str]]:
         return None
 
 
-def classify_intent(state: AgentState) -> AgentState:
+async def classify_intent(state: AgentState) -> AgentState:
     """意图识别与路由（RAG 子路由低置信度时 LLM 兜底）。"""
     router = get_intent_router()
     text = state.get("normalized_input", "") or state.get("user_input", "")
@@ -54,6 +54,6 @@ def classify_intent(state: AgentState) -> AgentState:
     rag_targets = intent.get("rag_targets")
     if intent["route"] == "rag" and not rag_targets:
         # 低置信度（规则未明确区分知识库），LLM 自主决策
-        rag_targets = _llm_rag_routing(text) or ["law"]
+        rag_targets = await _llm_rag_routing(text) or ["law"]
     state["rag_targets"] = rag_targets or ["law"]
     return state

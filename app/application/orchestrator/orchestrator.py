@@ -23,6 +23,10 @@ class AgentOrchestrator:
         """同步执行状态机。"""
         return cast(AgentState, self._graph.invoke(initial_state))
 
+    async def ainvoke(self, initial_state: dict) -> AgentState:
+        """异步执行状态机。"""
+        return cast(AgentState, await self._graph.ainvoke(initial_state))
+
     def stream(self, initial_state: AgentState):
         """流式执行状态机。"""
         return self._graph.stream(initial_state)

@@ -15,7 +15,7 @@ from graph.state import AgentState
 _CASE_DISCLAIMER = "注意：判例仅作个案参考，不能作为执业依据，法定依据以法规为准。"
 
 
-def generate(state: AgentState) -> AgentState:
+async def generate(state: AgentState) -> AgentState:
     """推理生成：基于 messages（含工具结果）与 RAG 上下文生成回答。"""
     if state.get("metadata", {}).get("injection", {}).get("detected"):
         return state  # 已拒绝注入，跳过
@@ -60,6 +60,6 @@ def generate(state: AgentState) -> AgentState:
 
     settings = get_settings()
     llm = ChatOllama(model=settings.ollama_model, temperature=settings.model_temperature)
-    response = llm.invoke(messages)
+    response = await llm.ainvoke(messages)
     state["generation"] = getattr(response, "content", "") or ""
     return state
